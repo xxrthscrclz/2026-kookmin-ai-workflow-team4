@@ -7,6 +7,7 @@ interface ActionCardProps {
   draggable?: boolean;
   isDragging?: boolean;
   isMoving?: boolean;
+  className?: string;
   onDragStart?: (event: React.DragEvent) => void;
   onDragEnd?: () => void;
 }
@@ -21,6 +22,7 @@ export default function ActionCard({
   draggable = false,
   isDragging = false,
   isMoving = false,
+  className = '',
   onDragStart,
   onDragEnd,
 }: ActionCardProps) {
@@ -42,7 +44,7 @@ export default function ActionCard({
       }}
       className={`glass w-full cursor-grab rounded-xl p-4 text-left transition-colors active:cursor-grabbing hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
         isDragging ? 'opacity-40' : ''
-      } ${isMoving ? 'pointer-events-none opacity-60' : ''}`}
+      } ${isMoving ? 'pointer-events-none opacity-60' : ''} ${className}`}
     >
       <div className="text-sm font-medium text-text-primary">{item.content}</div>
       <div className="mt-2 flex flex-wrap gap-2 text-xs text-text-secondary">

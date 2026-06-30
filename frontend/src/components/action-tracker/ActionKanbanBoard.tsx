@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import Card from '@/components/ui/Card';
 import ActionCard from '@/components/action-tracker/ActionCard';
 import {
   ACTION_STATUS_COLUMNS,
@@ -25,6 +24,8 @@ export default function ActionKanbanBoard({
   const [movingId, setMovingId] = useState<string | null>(null);
   const draggedRef = useRef(false);
 
+  const isDragging = draggingId !== null;
+
   const handleDragStart = (id: string, event: React.DragEvent) => {
     draggedRef.current = true;
     setDraggingId(id);
@@ -38,6 +39,18 @@ export default function ActionKanbanBoard({
     window.setTimeout(() => {
       draggedRef.current = false;
     }, 0);
+  };
+
+  const handleColumnDragOver = (status: ActionBoardStatus, event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    setDropTarget(status);
+  };
+
+  const handleColumnDragLeave = (status: ActionBoardStatus, event: React.DragEvent) => {
+    const related = event.relatedTarget;
+    if (related instanceof Node && event.currentTarget.contains(related)) return;
+    setDropTarget((current) => (current === status ? null : current));
   };
 
   const handleDrop = async (status: ActionBoardStatus) => {
@@ -61,35 +74,29 @@ export default function ActionKanbanBoard({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-2 xl:grid-cols-4">
       {ACTION_STATUS_COLUMNS.map((column) => {
         const columnItems = itemsByStatus[column.id];
         const isDropTarget = dropTarget === column.id;
 
         return (
-          <Card
+          <div
             key={column.id}
-            title={`${column.label} (${columnItems.length})`}
-            className={isDropTarget ? 'ring-2 ring-primary/40' : ''}
+            className={`glass flex min-h-56 flex-col rounded-2xl p-6 transition-colors ${
+              isDropTarget ? 'bg-primary/5 ring-2 ring-primary/40' : ''
+            }`}
+            onDragOver={(event) => handleColumnDragOver(column.id, event)}
+            onDragLeave={(event) => handleColumnDragLeave(column.id, event)}
+            onDrop={(event) => {
+              event.preventDefault();
+              void handleDrop(column.id);
+            }}
           >
-            <div
-              className={`flex min-h-24 flex-col gap-3 rounded-xl transition-colors ${
-                isDropTarget ? 'bg-primary/5' : ''
-              }`}
-              onDragOver={(event) => {
-                event.preventDefault();
-                event.dataTransfer.dropEffect = 'move';
-                setDropTarget(column.id);
-              }}
-              onDragLeave={(event) => {
-                if (event.currentTarget.contains(event.relatedTarget as Node)) return;
-                setDropTarget((current) => (current === column.id ? null : current));
-              }}
-              onDrop={(event) => {
-                event.preventDefault();
-                void handleDrop(column.id);
-              }}
-            >
+            <div className="mb-4 shrink-0 text-lg font-semibold text-text-primary">
+              {column.label} ({columnItems.length})
+            </div>
+
+            <div className="flex min-h-0 flex-1 flex-col gap-3">
               {columnItems.map((item) => (
                 <ActionCard
                   key={item.id}
@@ -97,6 +104,7 @@ export default function ActionKanbanBoard({
                   draggable
                   isDragging={draggingId === item.id}
                   isMoving={movingId === item.id}
+                  className={isDragging && draggingId !== item.id ? 'pointer-events-none' : ''}
                   onClick={() => {
                     if (draggedRef.current) return;
                     onItemClick(item);
@@ -105,13 +113,20 @@ export default function ActionKanbanBoard({
                   onDragEnd={handleDragEnd}
                 />
               ))}
-              {!loading && columnItems.length === 0 && (
-                <div className="text-sm text-text-muted">
-                  {isDropTarget ? '여기에 놓으면 상태가 변경됩니다' : '항목이 없습니다'}
-                </div>
-              )}
+
+              <div
+                className={`flex flex-1 flex-col justify-center rounded-xl border border-dashed border-transparent px-2 py-3 transition-colors ${
+                  isDropTarget ? 'border-primary/30 bg-primary/5' : ''
+                }`}
+              >
+                {!loading && columnItems.length === 0 && (
+                  <div className="text-center text-sm text-text-muted">
+                    {isDropTarget ? '여기에 놓으면 상태가 변경됩니다' : '항목이 없습니다'}
+                  </div>
+                )}
+              </div>
             </div>
-          </Card>
+          </div>
         );
       })}
     </div>
