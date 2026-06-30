@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Button from '@/components/ui/Button';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import ModalPortal from '@/components/ui/ModalPortal';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import DatePicker from '@/components/ui/DatePicker';
@@ -38,10 +40,14 @@ export default function ActionItemModal({
   onDelete,
 }: ActionItemModalProps) {
   const [draft, setDraft] = useState<ActionItemDraft>(EMPTY_DRAFT);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setConfirmDeleteOpen(false);
+      return;
+    }
     if (mode === 'edit' && item) {
       setDraft({
         content: item.content,
@@ -66,13 +72,13 @@ export default function ActionItemModal({
   }, [open, mode, item?.id]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || confirmDeleteOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [open, onClose]);
+  }, [open, confirmDeleteOpen, onClose]);
 
   if (!open) return null;
 
@@ -93,8 +99,21 @@ export default function ActionItemModal({
     });
   };
 
+  const handleConfirmDelete = () => {
+    if (!item || !onDelete) return;
+    onDelete(item.id);
+    setConfirmDeleteOpen(false);
+    onClose();
+  };
+
   return (
-    <div className="modal-overlay" onClick={onClose} role="presentation">
+    <ModalPortal>
+    <>
+    <div
+      className="modal-overlay"
+      onClick={confirmDeleteOpen ? undefined : onClose}
+      role="presentation"
+    >
       <div className="modal-overlay__blur" aria-hidden="true" />
       <div className="modal-overlay__vignette" aria-hidden="true" />
       <div
@@ -205,10 +224,7 @@ export default function ActionItemModal({
                 variant="ghost"
                 size="md"
                 className="text-error hover:bg-error/10"
-                onClick={() => {
-                  onDelete(item.id);
-                  onClose();
-                }}
+                onClick={() => setConfirmDeleteOpen(true)}
               >
                 삭제
               </Button>
@@ -217,5 +233,19 @@ export default function ActionItemModal({
         </form>
       </div>
     </div>
+
+    <ConfirmModal
+      open={confirmDeleteOpen}
+      title="액션 아이템 삭제"
+      message={
+        item
+          ? `「${item.content}」을(를) 삭제할까요? 이 작업은 되돌릴 수 없습니다.`
+          : '이 액션 아이템을 삭제할까요?'
+      }
+      onConfirm={handleConfirmDelete}
+      onCancel={() => setConfirmDeleteOpen(false)}
+    />
+    </>
+    </ModalPortal>
   );
 }
