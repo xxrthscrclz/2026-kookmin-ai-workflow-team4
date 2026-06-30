@@ -82,12 +82,12 @@ export default function ActionItemModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/20 p-4 pt-16 backdrop-blur-[3px] sm:pt-20"
       onClick={onClose}
       role="presentation"
     >
       <div
-        className="glass flex max-h-[90vh] w-full max-w-lg flex-col gap-4 overflow-y-auto rounded-2xl p-6"
+        className="glass flex max-h-[calc(100vh-5rem)] w-full max-w-lg flex-col gap-4 overflow-y-auto rounded-2xl p-6 shadow-lg"
         role="dialog"
         aria-modal="true"
         aria-labelledby="action-item-modal-title"
