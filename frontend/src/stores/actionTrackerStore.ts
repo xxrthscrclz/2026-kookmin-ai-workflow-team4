@@ -101,7 +101,7 @@ export const useActionTrackerStore = create<ActionTrackerState>((set, get) => ({
             content: updated.content,
             assignee: apiAssigneeToBoard(updated.assignee),
             dueDate: isoToDateKey(updated.dueDate),
-            status: patch.status !== undefined ? apiStatusToBoard(updated.status) : item.status,
+            status: patch.status !== undefined ? patch.status : apiStatusToBoard(updated.status),
             memo: patch.memo !== undefined ? patch.memo : item.memo,
             startDate: patch.startDate !== undefined ? patch.startDate : item.startDate,
           };
