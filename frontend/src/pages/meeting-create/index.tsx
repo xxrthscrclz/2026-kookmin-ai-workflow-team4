@@ -59,7 +59,7 @@ export default function MeetingCreatePage() {
             </label>
             <textarea
               id="raw-text"
-              className="min-h-48 w-full resize-y rounded-lg border border-border-default bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted outline-none transition-colors focus:border-border-focus focus:ring-2 focus:ring-primary/20"
+              className="min-h-48 w-full resize-y rounded-lg border border-glass-border bg-glass-bg px-3 py-2 text-sm text-text-primary backdrop-blur-sm placeholder:text-text-muted outline-none transition-colors focus:border-border-focus focus:ring-2 focus:ring-primary/20"
               placeholder="회의 전사본을 붙여넣으세요..."
               value={rawText}
               onChange={(e) => setRawText(e.target.value)}

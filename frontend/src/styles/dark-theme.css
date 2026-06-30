@@ -32,4 +32,13 @@
   --color-nav-hover-bg: #1e3a5f;
 
   --color-shadow: rgba(0, 0, 0, 0.3);
+
+  --color-glass-bg: rgba(30, 41, 59, 0.55);
+  --color-glass-bg-strong: rgba(30, 41, 59, 0.72);
+  --color-glass-border: rgba(148, 163, 184, 0.18);
+  --color-glass-highlight: rgba(255, 255, 255, 0.08);
+  --glass-blur: 20px;
+  --color-mesh-1: rgba(37, 99, 235, 0.25);
+  --color-mesh-2: rgba(59, 130, 246, 0.15);
+  --color-mesh-3: rgba(15, 23, 42, 0.9);
 }

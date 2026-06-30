@@ -78,12 +78,12 @@ interface ActionCardProps {
 
 function ActionCard({ item }: ActionCardProps) {
   return (
-    <div className="rounded-lg border border-border-default bg-bg-muted p-4">
+    <div className="glass rounded-xl p-4">
       <div className="text-sm font-medium text-text-primary">{item.content}</div>
       <div className="mt-2 flex flex-wrap gap-2 text-xs text-text-secondary">
         <div className="rounded-full bg-bg-accent px-2 py-0.5">{item.assignee}</div>
         {item.dueDate && (
-          <div className="rounded-full bg-bg-surface px-2 py-0.5 border border-border-default">
+          <div className="rounded-full glass px-2 py-0.5">
             {item.dueDate}
           </div>
         )}

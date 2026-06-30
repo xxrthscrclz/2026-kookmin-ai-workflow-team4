@@ -40,6 +40,11 @@
 
   --color-shadow: var(--color-shadow);
 
+  --color-glass-bg: var(--color-glass-bg);
+  --color-glass-bg-strong: var(--color-glass-bg-strong);
+  --color-glass-border: var(--color-glass-border);
+  --color-glass-highlight: var(--color-glass-highlight);
+
   --font-sans: 'Pretendard', 'Inter', system-ui, -apple-system, sans-serif;
 }
 

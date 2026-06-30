@@ -13,7 +13,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary:
     'bg-primary text-text-inverse hover:bg-primary-hover border border-transparent',
   secondary:
-    'bg-bg-surface text-primary border border-border-default hover:bg-bg-muted',
+    'glass text-primary border-glass-border hover:bg-glass-bg-strong',
   ghost: 'bg-transparent text-text-secondary hover:bg-bg-muted border border-transparent',
 };
 

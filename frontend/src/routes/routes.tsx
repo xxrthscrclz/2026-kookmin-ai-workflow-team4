@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
-import HomePage from '@/pages/home/index';
+import IntroPage from '@/pages/intro/index';
 import MeetingCreatePage from '@/pages/meeting-create/index';
 import ActionTrackerPage from '@/pages/action-tracker/index';
 import MeetingSearchPage from '@/pages/meeting-search/index';
@@ -10,7 +10,7 @@ export default function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route index element={<HomePage />} />
+          <Route index element={<IntroPage />} />
           <Route path="meetings/create" element={<MeetingCreatePage />} />
           <Route path="actions" element={<ActionTrackerPage />} />
           <Route path="search" element={<MeetingSearchPage />} />

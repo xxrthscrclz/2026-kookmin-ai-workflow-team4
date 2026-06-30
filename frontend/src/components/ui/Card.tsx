@@ -9,10 +9,7 @@ interface CardProps {
 
 export default function Card({ title, description, children, className = '' }: CardProps) {
   return (
-    <div
-      className={`rounded-xl border border-border-default bg-bg-surface p-6 shadow-sm ${className}`}
-      style={{ boxShadow: `0 1px 3px var(--color-shadow)` }}
-    >
+    <div className={`glass flex flex-col rounded-2xl p-6 ${className}`}>
       {(title || description) && (
         <div className="mb-4 flex flex-col gap-1">
           {title && (

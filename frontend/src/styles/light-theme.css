@@ -39,4 +39,14 @@
 
   /* Shadow */
   --color-shadow: rgba(37, 99, 235, 0.08);
+
+  /* Glass */
+  --color-glass-bg: rgba(255, 255, 255, 0.55);
+  --color-glass-bg-strong: rgba(255, 255, 255, 0.72);
+  --color-glass-border: rgba(255, 255, 255, 0.65);
+  --color-glass-highlight: rgba(255, 255, 255, 0.85);
+  --glass-blur: 18px;
+  --color-mesh-1: rgba(37, 99, 235, 0.18);
+  --color-mesh-2: rgba(96, 165, 250, 0.22);
+  --color-mesh-3: rgba(191, 219, 254, 0.45);
 }
