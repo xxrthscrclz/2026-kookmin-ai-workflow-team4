@@ -23,8 +23,11 @@ npm run dev                 # http://localhost:8080
 
 ```bash
 npm run typecheck           # tsc --noEmit
-npm run smoke               # mock 모드 HTTP 스모크 테스트(POST/GET/404/400)
+npm run smoke               # mock 모드 HTTP 스모크 테스트(meetings: POST/GET/404/400)
+npm run smoke:be2           # mock 모드 HTTP 스모크 테스트(actions·search)
 ```
+
+전체 절차(시드·수동 E2E 포함)와 검증 기록은 [`TESTING.md`](TESTING.md) 참고.
 
 ## 구조 (소유: BE-1 / BE-2)
 

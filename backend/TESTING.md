@@ -65,4 +65,4 @@ npm start                   # 또는 npm run dev — http://localhost:8080
 | 에러 `400`/`404`/`400(in_progress)` | ✅ 코드·형식 일치 |
 
 - **백엔드는 `docs/api-contract.md`와 완전 일치. 런타임/데이터 버그 없음.**
-- **FE 연동은 미완**: 화면 3페이지가 아직 목업 데이터를 쓰고 `frontend/src/api/command.ts`가 계약과 어긋난다(검색 `POST`↔`GET`, meetings 배열↔봉투 등). → 이슈 #14(FE API 연동) 후속 필요.
+- **FE 연동은 미완**: 화면 3페이지가 아직 목업 데이터를 쓰고 `frontend/src/api/command.ts`가 계약과 어긋난다(검색 `POST`↔`GET`, meetings 배열↔봉투 등). → 이슈 #19(FE 3페이지 실제 API 연동) 후속 필요. (구 #14는 closed)
