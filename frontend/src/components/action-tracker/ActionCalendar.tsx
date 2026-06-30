@@ -90,7 +90,7 @@ export default function ActionCalendar({ items, onItemClick }: ActionCalendarPro
       setViewMonth(0);
       return;
     }
-    setViewMonth((m) => m - 1);
+    setViewMonth((m) => m + 1);
   };
 
   return (
