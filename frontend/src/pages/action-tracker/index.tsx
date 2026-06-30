@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Card from '@/components/ui/Card';
 import Alert from '@/components/ui/Alert';
 import Button from '@/components/ui/Button';
-import ActionCard from '@/components/action-tracker/ActionCard';
+import ActionKanbanBoard from '@/components/action-tracker/ActionKanbanBoard';
 import ActionCalendar from '@/components/action-tracker/ActionCalendar';
 import ActionItemModal from '@/components/action-tracker/ActionItemModal';
 import { USE_MOCK } from '@/api/config';
@@ -63,7 +62,7 @@ export default function ActionTrackerPage() {
         <div className="flex flex-col gap-2">
           <div className="text-2xl font-bold text-text-primary">액션 아이템 트래커</div>
           <div className="text-sm text-text-secondary">
-            액션을 추가하고 카드를 눌러 시작일·마감일·메모를 수정하세요.
+            카드를 드래그해 상태를 변경하거나, 클릭해 시작일·마감일·메모를 수정하세요.
           </div>
         </div>
         <Button type="button" onClick={() => setModal({ open: true, mode: 'add' })}>
@@ -85,28 +84,19 @@ export default function ActionTrackerPage() {
 
       {loading && <div className="text-sm text-text-muted">액션 목록을 불러오는 중...</div>}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {ACTION_STATUS_COLUMNS.map((column) => {
-          const columnItems = itemsByStatus[column.id];
-
-          return (
-            <Card key={column.id} title={`${column.label} (${columnItems.length})`}>
-              <div className="flex flex-col gap-3">
-                {columnItems.map((item) => (
-                  <ActionCard
-                    key={item.id}
-                    item={item}
-                    onClick={() => setModal({ open: true, mode: 'edit', item })}
-                  />
-                ))}
-                {!loading && columnItems.length === 0 && (
-                  <div className="text-sm text-text-muted">항목이 없습니다.</div>
-                )}
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+      <ActionKanbanBoard
+        itemsByStatus={itemsByStatus}
+        loading={loading}
+        onItemClick={(item) => setModal({ open: true, mode: 'edit', item })}
+        onStatusChange={async (id, status) => {
+          setSaveError(null);
+          try {
+            await updateItem(id, { status });
+          } catch (err) {
+            setSaveError(err instanceof Error ? err.message : '상태 변경에 실패했습니다.');
+          }
+        }}
+      />
 
       <ActionCalendar
         items={items}
