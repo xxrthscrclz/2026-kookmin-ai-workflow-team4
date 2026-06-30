@@ -27,11 +27,15 @@ api.interceptors.response.use(
   (error) => {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status ?? 0;
+      const payload = error.response?.data as
+        | { error?: { code?: string; message?: string }; message?: string }
+        | undefined;
       const message =
-        (error.response?.data as { message?: string })?.message ??
+        payload?.error?.message ??
+        payload?.message ??
         error.message ??
         '요청 처리 중 오류가 발생했습니다.';
-      const code = (error.response?.data as { code?: string })?.code;
+      const code = payload?.error?.code;
       return Promise.reject(new ApiRequestError(message, status, code));
     }
     return Promise.reject(error);

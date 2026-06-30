@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Button from '@/components/ui/Button';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import ModalPortal from '@/components/ui/ModalPortal';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import DatePicker from '@/components/ui/DatePicker';
@@ -10,8 +12,10 @@ interface ActionItemModalProps {
   open: boolean;
   mode: 'add' | 'edit';
   item?: ActionBoardItem;
+  title?: string;
+  submitLabel?: string;
   onClose: () => void;
-  onSave: (draft: ActionItemDraft) => void;
+  onSave: (draft: ActionItemDraft) => void | Promise<void>;
   onDelete?: (id: string) => void;
 }
 
@@ -29,15 +33,21 @@ export default function ActionItemModal({
   open,
   mode,
   item,
+  title,
+  submitLabel,
   onClose,
   onSave,
   onDelete,
 }: ActionItemModalProps) {
   const [draft, setDraft] = useState<ActionItemDraft>(EMPTY_DRAFT);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setConfirmDeleteOpen(false);
+      return;
+    }
     if (mode === 'edit' && item) {
       setDraft({
         content: item.content,
@@ -62,33 +72,48 @@ export default function ActionItemModal({
   }, [open, mode, item?.id]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || confirmDeleteOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [open, onClose]);
+  }, [open, confirmDeleteOpen, onClose]);
 
   if (!open) return null;
 
-  const handleSubmit = (event: FormEvent) => {
+  const modalTitle = title ?? (mode === 'add' ? '액션 아이템 추가' : '액션 아이템 수정');
+  const modalSubmitLabel = submitLabel ?? (mode === 'add' ? '추가' : '저장');
+
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const content = draft.content.trim();
     if (!content) return;
 
-    onSave({
+    await onSave({
       ...draft,
       content,
       assignee: draft.assignee?.trim() || null,
       meeting: draft.meeting.trim() || '수동 추가',
       memo: draft.memo.trim(),
     });
+  };
+
+  const handleConfirmDelete = () => {
+    if (!item || !onDelete) return;
+    onDelete(item.id);
+    setConfirmDeleteOpen(false);
     onClose();
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="presentation">
+    <ModalPortal>
+    <>
+    <div
+      className="modal-overlay"
+      onClick={confirmDeleteOpen ? undefined : onClose}
+      role="presentation"
+    >
       <div className="modal-overlay__blur" aria-hidden="true" />
       <div className="modal-overlay__vignette" aria-hidden="true" />
       <div
@@ -101,7 +126,7 @@ export default function ActionItemModal({
       >
         <div className="flex flex-col gap-1">
           <div id="action-item-modal-title" className="text-lg font-semibold text-text-primary">
-            {mode === 'add' ? '액션 아이템 추가' : '액션 아이템 수정'}
+            {modalTitle}
           </div>
           <div className="text-sm text-text-secondary">
             시작일·마감일·메모를 입력하고 저장하세요.
@@ -187,7 +212,7 @@ export default function ActionItemModal({
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
             <div className="flex gap-2">
               <Button type="submit" size="md">
-                {mode === 'add' ? '추가' : '저장'}
+                {modalSubmitLabel}
               </Button>
               <Button type="button" variant="secondary" size="md" onClick={onClose}>
                 취소
@@ -199,10 +224,7 @@ export default function ActionItemModal({
                 variant="ghost"
                 size="md"
                 className="text-error hover:bg-error/10"
-                onClick={() => {
-                  onDelete(item.id);
-                  onClose();
-                }}
+                onClick={() => setConfirmDeleteOpen(true)}
               >
                 삭제
               </Button>
@@ -211,5 +233,19 @@ export default function ActionItemModal({
         </form>
       </div>
     </div>
+
+    <ConfirmModal
+      open={confirmDeleteOpen}
+      title="액션 아이템 삭제"
+      message={
+        item
+          ? `「${item.content}」을(를) 삭제할까요? 이 작업은 되돌릴 수 없습니다.`
+          : '이 액션 아이템을 삭제할까요?'
+      }
+      onConfirm={handleConfirmDelete}
+      onCancel={() => setConfirmDeleteOpen(false)}
+    />
+    </>
+    </ModalPortal>
   );
 }
