@@ -6,6 +6,7 @@ import { buildMonthWeeks } from '@/utils/calendarWeekBars';
 import { getFieldPopoverPosition } from '@/utils/fieldPopoverPosition';
 
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+const POPOVER_WIDTH = 304;
 
 interface DatePickerProps {
   label?: string;
@@ -47,7 +48,7 @@ export default function DatePicker({
   const updatePosition = () => {
     const rect = triggerRef.current?.getBoundingClientRect();
     if (!rect) return;
-    setPosition(getFieldPopoverPosition(rect, 300));
+    setPosition(getFieldPopoverPosition(rect, POPOVER_WIDTH));
   };
 
   const openPicker = () => {
@@ -174,7 +175,6 @@ export default function DatePicker({
             style={{
               top: position.top,
               left: position.left,
-              width: position.width,
             }}
           >
             <div className="calendar-shell calendar-shell--compact">
