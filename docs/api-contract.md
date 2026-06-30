@@ -380,6 +380,51 @@ DB에 저장한 뒤, 생성된 회의 1건을 반환한다.
 
 ---
 
+## 6.3 POST /api/actions/generate
+
+회의 전사본(`rawText`)에서 **액션아이템을 LLM으로 추출해 저장**한다(#28 §2). 회의록 생성(`POST /api/meetings`)과 분리돼, 클라이언트가 원할 때만 호출한다. 라우트는 `:id` 라우트보다 앞에 등록된다.
+
+### 요청 본문
+
+| 필드 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| `meetingId` | string | ✅ | 대상 회의 id(존재해야 함) |
+| `mode` | `'one' \| 'all'` | ❌(기본 `all`) | `one`=새 액션 1건, `all`=남은 전체 |
+
+```json
+// POST /api/actions/generate
+{ "meetingId": "clxxxxxxxxxxxxxx", "mode": "all" }
+```
+
+- 두 mode 모두 **이미 해당 회의에 저장된 `content`는 제외**(중복 미생성). `one`은 중복 제외 후 1건만.
+
+### 응답
+
+생성된 ActionItem 배열과 생성 개수를 반환한다(항목은 `GET`의 `meeting` 컨텍스트 없는 bare ActionItem, `status`는 항상 `todo`).
+
+```json
+{
+  "actions": [
+    { "id": "clyyy", "meetingId": "clxxx", "content": "검색 API 설계", "assignee": "김하나", "dueDate": null, "status": "todo", "createdAt": "2026-06-30T09:23:50.000Z" }
+  ],
+  "generated": 1
+}
+```
+
+- 새로 생성됨(≥1) → `201 Created`
+- 추출할 새 항목 없음(중복뿐/추출 0) → `200 OK` + `{ "actions": [], "generated": 0 }`
+- 응답 헤더 `X-LLM-Mode: mock|live` (mock·live 응답 스키마 동일)
+
+### 에러
+
+| 상태 | code | 상황 |
+|---|---|---|
+| `400` | `VALIDATION_ERROR` | `meetingId` 누락 / `mode` 허용값 위반 |
+| `404` | `NOT_FOUND` | `meetingId`가 가리키는 회의 없음 |
+| `502` | `LLM_ERROR` | LLM 호출 실패(live 모드) |
+
+---
+
 ## 7. GET /api/search
 
 키워드로 회의를 검색한다. 회의 `title`·`rawText`와 소속 액션아이템 `content`에서
