@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import DamrokMark from '@/components/brand/DamrokMark';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 
 const navItems = [
@@ -20,7 +21,7 @@ export default function Header() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-4">
         <NavLink to="/" className="brand-link flex items-center gap-2 no-underline">
           <div className="brand-logo flex h-8 w-8 items-center justify-center rounded-lg bg-primary/90 shadow-md">
-            <img src="/damrok-mark.svg" alt="담록 아이콘" className="h-7 w-7 object-contain" />
+            <DamrokMark className="h-6 w-6" />
           </div>
           <div className="text-base font-semibold text-nav-text transition-colors duration-200">
             담록

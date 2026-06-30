@@ -1,11 +1,22 @@
+@layer base {
+  :root {
+    --theme-color-transition-duration: 0.5s;
+    --theme-toggle-transition-duration: 0.5s;
+  }
+
+  html.theme-transitioning body,
+  html.theme-transitioning body *:not(.theme-switch):not(.theme-switch-track):not(.theme-switch-icon):not(
+      .theme-switch-thumb
+    ) {
+    transition-property: background-color, color, border-color, box-shadow, fill, stroke;
+    transition-duration: var(--theme-color-transition-duration);
+    transition-timing-function: ease;
+  }
+}
+
 @layer utilities {
   .mesh-bg {
     background-color: var(--color-bg-page);
-    background-image:
-      radial-gradient(ellipse 80% 60% at 10% 15%, var(--color-mesh-1), transparent 55%),
-      radial-gradient(ellipse 70% 50% at 90% 10%, var(--color-mesh-2), transparent 50%),
-      radial-gradient(ellipse 60% 70% at 50% 95%, var(--color-mesh-3), transparent 55%);
-    background-attachment: fixed;
   }
 
   .glass {
@@ -164,7 +175,10 @@
     box-shadow:
       0 2px 10px var(--color-shadow),
       inset 0 1px 0 var(--color-glass-highlight);
-    transition: background-color 0.7s ease, border-color 0.7s ease, box-shadow 0.7s ease;
+    transition:
+      background-color var(--theme-toggle-transition-duration) ease,
+      border-color var(--theme-toggle-transition-duration) ease,
+      box-shadow var(--theme-toggle-transition-duration) ease;
   }
 
   .theme-switch-track-dark {
@@ -191,7 +205,10 @@
     justify-content: center;
     width: 1.125rem;
     height: 1.125rem;
-    transition: opacity 0.7s ease, transform 0.7s ease, color 0.7s ease;
+    transition:
+      opacity var(--theme-toggle-transition-duration) ease,
+      transform var(--theme-toggle-transition-duration) ease,
+      color var(--theme-toggle-transition-duration) ease;
     user-select: none;
     pointer-events: none;
   }
@@ -222,11 +239,11 @@
     border: 2px solid var(--color-switch-thumb-border);
     box-shadow: 0 3px 12px rgba(37, 99, 235, 0.35);
     transition:
-      left 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-      right 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-      width 0.7s ease,
-      background-color 0.7s ease,
-      box-shadow 0.7s ease;
+      left var(--theme-toggle-transition-duration) cubic-bezier(0.22, 1, 0.36, 1),
+      right var(--theme-toggle-transition-duration) cubic-bezier(0.22, 1, 0.36, 1),
+      width var(--theme-toggle-transition-duration) ease,
+      background-color var(--theme-toggle-transition-duration) ease,
+      box-shadow var(--theme-toggle-transition-duration) ease;
   }
 
   .theme-switch-thumb-dark {
@@ -261,7 +278,13 @@
     .brand-link,
     .brand-logo,
     .theme-switch-thumb,
-    .theme-switch-track {
+    .theme-switch-track,
+    .theme-switch-icon {
+      transition: none;
+    }
+
+    html.theme-transitioning body,
+    html.theme-transitioning body * {
       transition: none;
     }
   }

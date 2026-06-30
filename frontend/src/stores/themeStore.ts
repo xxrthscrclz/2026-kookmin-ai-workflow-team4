@@ -9,8 +9,28 @@ interface ThemeState {
   toggleTheme: () => void;
 }
 
-function applyThemeClass(theme: Theme) {
+let themeTransitionTimer: number | undefined;
+
+function startThemeTransition() {
   const root = document.documentElement;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+
+  root.classList.add('theme-transitioning');
+  window.clearTimeout(themeTransitionTimer);
+  themeTransitionTimer = window.setTimeout(() => {
+    root.classList.remove('theme-transitioning');
+  }, 550);
+}
+
+function applyThemeClass(theme: Theme, animate = false) {
+  const root = document.documentElement;
+  if (animate) {
+    startThemeTransition();
+  }
+
   if (theme === 'dark') {
     root.classList.add('dark');
   } else {
@@ -24,13 +44,13 @@ export const useThemeStore = create<ThemeState>()(
       theme: 'light',
 
       setTheme: (theme: Theme) => {
-        applyThemeClass(theme);
+        applyThemeClass(theme, true);
         set({ theme });
       },
 
       toggleTheme: () => {
         const next = get().theme === 'light' ? 'dark' : 'light';
-        applyThemeClass(next);
+        applyThemeClass(next, true);
         set({ theme: next });
       },
     }),
