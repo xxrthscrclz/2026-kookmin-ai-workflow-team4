@@ -154,19 +154,12 @@ export default function ActionItemModal({
             label="상태"
             id="action-status"
             value={draft.status}
-            onChange={(e) =>
-              setDraft((prev) => ({
-                ...prev,
-                status: e.target.value as ActionItemDraft['status'],
-              }))
-            }
-          >
-            {ACTION_STATUS_COLUMNS.map((column) => (
-              <option key={column.id} value={column.id}>
-                {column.label}
-              </option>
-            ))}
-          </Select>
+            onChange={(status) => setDraft((prev) => ({ ...prev, status }))}
+            options={ACTION_STATUS_COLUMNS.map((column) => ({
+              value: column.id,
+              label: column.label,
+            }))}
+          />
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="action-memo" className="text-sm font-medium text-text-secondary">
