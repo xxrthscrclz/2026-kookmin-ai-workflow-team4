@@ -1,11 +1,7 @@
 import Button from '@/components/ui/Button';
 import type { ActionItem } from '@/api/types';
+import { getStatusLabel } from '@/constants/actionTracker';
 import { isoToDateKey } from '@/utils/actionApiMapper';
-
-const STATUS_LABEL: Record<ActionItem['status'], string> = {
-  todo: '할 일',
-  done: '완료',
-};
 
 interface MeetingDetailActionItemRowProps {
   action: ActionItem;
@@ -27,7 +23,7 @@ export default function MeetingDetailActionItemRow({
         <div className="font-medium text-text-primary">{action.content}</div>
         <div className="mt-1 text-xs text-text-muted">
           담당 {action.assignee ?? '미정'} · 마감 {isoToDateKey(action.dueDate) ?? '미정'} ·{' '}
-          {STATUS_LABEL[action.status]}
+          {getStatusLabel(action.status)}
         </div>
       </div>
 

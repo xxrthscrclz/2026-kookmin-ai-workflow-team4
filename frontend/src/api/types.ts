@@ -19,13 +19,15 @@ export interface Meeting extends MeetingListItem {
   actionItems: ActionItem[];
 }
 
+export type ActionItemStatus = 'todo' | 'in_progress' | 'done' | 'on_hold';
+
 export interface ActionItem {
   id: string;
   meetingId: string;
   content: string;
   assignee: string | null;
   dueDate: string | null;
-  status: 'todo' | 'done';
+  status: ActionItemStatus;
   createdAt: string;
 }
 
@@ -65,7 +67,7 @@ export interface CreateMeetingRequest {
 }
 
 export interface UpdateActionItemRequest {
-  status?: 'todo' | 'done';
+  status?: ActionItemStatus;
   content?: string;
   assignee?: string | null;
   dueDate?: string | null;
@@ -74,7 +76,7 @@ export interface UpdateActionItemRequest {
 export interface CreateActionItemRequest {
   content: string;
   meetingId: string;
-  status?: 'todo' | 'in_progress' | 'done' | 'on_hold';
+  status?: ActionItemStatus;
   assignee?: string | null;
   dueDate?: string | null;
 }
