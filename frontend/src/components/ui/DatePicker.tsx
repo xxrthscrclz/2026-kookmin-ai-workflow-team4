@@ -218,7 +218,7 @@ export default function DatePicker({
               <div className="grid grid-cols-7 gap-1">
                 {monthWeeks.flat().map((cell, index) => {
                   const isToday = cell.dateKey === todayKey;
-                  const isSelected = cell.dateKey === value;
+                  const isSelected = value !== null && cell.dateKey === value;
                   const dayClass = [
                     'calendar-day-btn',
                     'calendar-day-btn--compact',

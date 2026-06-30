@@ -154,7 +154,8 @@ export default function ActionCalendar({ items, onItemClick }: ActionCalendarPro
                 <div className="grid grid-cols-7 gap-1.5">
                   {week.map((cell, colIndex) => {
                     const isToday = cell.dateKey === todayKey;
-                    const isSelected = cell.dateKey === selectedDateKey;
+                    const isSelected =
+                      selectedDateKey !== null && cell.dateKey === selectedDateKey;
                     const dayClass = [
                       'calendar-day-btn',
                       isToday ? 'calendar-day-btn--today' : '',
