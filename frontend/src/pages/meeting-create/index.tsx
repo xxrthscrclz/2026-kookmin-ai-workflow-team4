@@ -24,7 +24,7 @@ export default function MeetingCreatePage() {
       <div className="flex flex-col gap-2">
         <div className="text-2xl font-bold text-text-primary">회의록 생성</div>
         <div className="text-sm text-text-secondary">
-          회의 전사본을 입력하거나 PDF·Word·Markdown 파일을 업로드하면 AI가 구조화된
+          회의 내용을 직접 입력하거나 PDF·Word·Markdown 파일을 업로드하면 AI가 구조화된
           회의록을 생성합니다.
         </div>
       </div>
@@ -78,7 +78,7 @@ export default function MeetingCreatePage() {
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="raw-text" className="text-sm font-medium text-text-secondary">
-              전사본
+              회의 내용
               {uploadedFileName && (
                 <div className="mt-0.5 text-xs font-normal text-primary">
                   {uploadedFileName}에서 불러옴
@@ -88,7 +88,7 @@ export default function MeetingCreatePage() {
             <textarea
               id="raw-text"
               className="min-h-48 w-full resize-y rounded-lg border border-glass-border bg-glass-bg px-3 py-2 text-sm text-text-primary backdrop-blur-sm placeholder:text-text-muted outline-none transition-colors focus:border-border-focus focus:ring-2 focus:ring-primary/20"
-              placeholder="회의 전사본을 붙여넣거나 위에서 파일을 업로드하세요..."
+              placeholder="회의 내용을 붙여넣거나 위에서 파일을 업로드하세요..."
               value={rawText}
               onChange={(e) => setRawText(e.target.value)}
               required
