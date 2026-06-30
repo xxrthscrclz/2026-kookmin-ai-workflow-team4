@@ -71,16 +71,9 @@ export default function ActionTrackerPage() {
         </Button>
       </div>
 
-      {USE_MOCK ? (
+      {USE_MOCK && (
         <Alert variant="info">
           목업 모드(VITE_USE_MOCK=true)입니다. 브라우저 메모리에만 저장됩니다.
-        </Alert>
-      ) : (
-        <Alert variant="info">
-          백엔드 API에서 액션을 불러옵니다. 상태·내용·담당자·마감일 변경은 PATCH로 저장됩니다.
-          보드 상태는 API 기준 할 일(todo)·완료(done)만 영속되며, 진행 중·보류는 UI 전용입니다.
-          시작일·메모는 FE 전용이며 API에 저장되지 않습니다. 수동 추가·삭제는 현재 세션에만 반영됩니다(API POST/DELETE
-          미지원, #23).
         </Alert>
       )}
 
