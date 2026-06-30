@@ -187,18 +187,13 @@ export default function ActionCalendar({ items, onItemClick }: ActionCalendarPro
                     const radius =
                       `${segment.roundLeft ? 'rounded-l-lg' : 'rounded-l-sm'} ` +
                       `${segment.roundRight ? 'rounded-r-lg' : 'rounded-r-sm'}`;
-                    const segmentDateKey = week[segment.startCol].dateKey;
 
                     return (
                       <button
                         key={`${segment.item.id}-${weekIndex}-${segment.startCol}-${segment.lane}`}
                         type="button"
-                        onClick={() => selectDate(segmentDateKey, segment.item.id)}
-                        className={`calendar-bar-btn ${color.calendarBar} ${color.badgeText} ${radius} ${
-                          highlightItemId === segment.item.id && selectedDateKey === segmentDateKey
-                            ? 'ring-2 ring-primary ring-offset-1'
-                            : ''
-                        }`}
+                        onClick={() => onItemClick?.(segment.item)}
+                        className={`calendar-bar-btn ${color.calendarBar} ${color.badgeText} ${radius}`}
                         style={{
                           gridColumn: `${segment.startCol + 1} / span ${segment.span}`,
                           gridRow: segment.lane + 1,
