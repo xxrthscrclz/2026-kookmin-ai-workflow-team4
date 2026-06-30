@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import Card from '@/components/ui/Card';
+import ActionCalendarDayPanel from '@/components/action-tracker/ActionCalendarDayPanel';
 import type { ActionBoardItem } from '@/constants/actionTracker';
 import {
   formatDateRange,
@@ -12,15 +13,18 @@ import { buildMonthWeeks, buildWeekBarSegments } from '@/utils/calendarWeekBars'
 
 interface ActionCalendarProps {
   items: ActionBoardItem[];
+  onItemClick?: (item: ActionBoardItem) => void;
 }
 
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 const BAR_ROW_HEIGHT = 22;
 
-export default function ActionCalendar({ items }: ActionCalendarProps) {
+export default function ActionCalendar({ items, onItemClick }: ActionCalendarProps) {
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
+  const [highlightItemId, setHighlightItemId] = useState<string | null>(null);
 
   const itemsWithRange = useMemo(
     () =>
@@ -65,6 +69,12 @@ export default function ActionCalendar({ items }: ActionCalendarProps) {
 
   const assigneeLegend = useMemo(() => getUniqueAssignees(items), [items]);
 
+  const selectDate = (dateKey: string | null, itemId?: string) => {
+    if (!dateKey) return;
+    setSelectedDateKey(dateKey);
+    setHighlightItemId(itemId ?? null);
+  };
+
   const goPrevMonth = () => {
     if (viewMonth === 0) {
       setViewYear((y) => y - 1);
@@ -80,13 +90,13 @@ export default function ActionCalendar({ items }: ActionCalendarProps) {
       setViewMonth(0);
       return;
     }
-    setViewMonth((m) => m + 1);
+    setViewMonth((m) => m - 1);
   };
 
   return (
     <Card
       title="일정 캘린더"
-      description="시작일부터 마감일까지 기간이 한 줄로 이어져 표시됩니다. 색상은 담당자별로 구분됩니다."
+      description="날짜나 일정 바를 누르면 그날 해야 할 일·진행 상태를 확인할 수 있습니다."
     >
       <div className="flex flex-col gap-6">
         {assigneeLegend.length > 0 && (
@@ -150,26 +160,34 @@ export default function ActionCalendar({ items }: ActionCalendarProps) {
                 <div className="grid grid-cols-7 gap-1">
                   {week.map((cell, colIndex) => {
                     const isToday = cell.dateKey === todayKey;
+                    const isSelected = cell.dateKey === selectedDateKey;
 
                     return (
-                      <div
+                      <button
                         key={`day-${weekIndex}-${colIndex}`}
-                        className={`flex min-h-7 items-start justify-end rounded-md border p-1 ${
-                          isToday
-                            ? 'border-primary bg-primary-subtle'
-                            : 'border-transparent bg-transparent'
+                        type="button"
+                        disabled={!cell.dateKey}
+                        onClick={() => selectDate(cell.dateKey)}
+                        className={`flex min-h-7 items-start justify-end rounded-md border p-1 transition-colors ${
+                          !cell.dateKey
+                            ? 'cursor-default border-transparent'
+                            : isSelected
+                              ? 'border-primary bg-primary-subtle'
+                              : isToday
+                                ? 'border-primary/50 bg-primary-subtle/50 hover:bg-primary-subtle'
+                                : 'border-transparent hover:bg-bg-muted'
                         }`}
                       >
                         {cell.day !== null && (
                           <div
                             className={`text-xs font-medium ${
-                              isToday ? 'text-primary' : 'text-text-secondary'
+                              isToday || isSelected ? 'text-primary' : 'text-text-secondary'
                             }`}
                           >
                             {cell.day}
                           </div>
                         )}
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -183,11 +201,18 @@ export default function ActionCalendar({ items }: ActionCalendarProps) {
                     const radius =
                       `${segment.roundLeft ? 'rounded-l-md' : 'rounded-l-none'} ` +
                       `${segment.roundRight ? 'rounded-r-md' : 'rounded-r-none'}`;
+                    const segmentDateKey = week[segment.startCol].dateKey;
 
                     return (
-                      <div
+                      <button
                         key={`${segment.item.id}-${weekIndex}-${segment.startCol}-${segment.lane}`}
-                        className={`flex h-5 items-center truncate px-1.5 text-[10px] leading-none ${color.calendarBar} ${color.badgeText} ${radius}`}
+                        type="button"
+                        onClick={() => selectDate(segmentDateKey, segment.item.id)}
+                        className={`flex h-5 cursor-pointer items-center truncate px-1.5 text-[10px] leading-none transition-opacity hover:opacity-90 ${color.calendarBar} ${color.badgeText} ${radius} ${
+                          highlightItemId === segment.item.id && selectedDateKey === segmentDateKey
+                            ? 'ring-2 ring-primary ring-offset-1'
+                            : ''
+                        }`}
                         style={{
                           gridColumn: `${segment.startCol + 1} / span ${segment.span}`,
                           gridRow: segment.lane + 1,
@@ -195,7 +220,7 @@ export default function ActionCalendar({ items }: ActionCalendarProps) {
                         title={segment.item.content}
                       >
                         {segment.showLabel ? segment.item.content : ''}
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -203,6 +228,19 @@ export default function ActionCalendar({ items }: ActionCalendarProps) {
             );
           })}
         </div>
+
+        {selectedDateKey && (
+          <ActionCalendarDayPanel
+            dateKey={selectedDateKey}
+            items={items}
+            highlightItemId={highlightItemId}
+            onItemClick={onItemClick}
+            onClose={() => {
+              setSelectedDateKey(null);
+              setHighlightItemId(null);
+            }}
+          />
+        )}
 
         <div className="flex flex-col gap-2">
           <div className="text-sm font-medium text-text-primary">
@@ -217,16 +255,18 @@ export default function ActionCalendar({ items }: ActionCalendarProps) {
                 const rangeLabel = formatDateRange(item);
 
                 return (
-                  <div
+                  <button
                     key={item.id}
-                    className="flex flex-wrap items-center gap-2 rounded-lg glass px-3 py-2 text-sm"
+                    type="button"
+                    onClick={() => onItemClick?.(item)}
+                    className="flex flex-wrap items-center gap-2 rounded-lg glass px-3 py-2 text-left text-sm transition-colors hover:bg-bg-muted"
                   >
                     <div className={`rounded-full px-2 py-0.5 text-xs ${color.badgeBg} ${color.badgeText}`}>
                       {item.assignee ?? '담당자 미정'}
                     </div>
                     <div className="font-medium text-text-primary">{rangeLabel}</div>
                     <div className="text-text-primary">{item.content}</div>
-                  </div>
+                  </button>
                 );
               })}
             </div>

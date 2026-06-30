@@ -75,7 +75,10 @@ export default function ActionTrackerPage() {
         })}
       </div>
 
-      <ActionCalendar items={items} />
+      <ActionCalendar
+        items={items}
+        onItemClick={(item) => setModal({ open: true, mode: 'edit', item })}
+      />
 
       <ActionItemModal
         open={modal.open}
