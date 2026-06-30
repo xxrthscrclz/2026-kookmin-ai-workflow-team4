@@ -315,7 +315,7 @@ DB에 저장한 뒤, 생성된 회의 1건을 반환한다.
 
 ### 응답 `200 OK`
 
-갱신된 ActionItem 1건을 반환한다(본 문서 상단 ActionItem 스키마와 동일, `meeting` 미포함).
+갱신된 ActionItem 1건을 `meeting{id,title,date}` 컨텍스트와 함께 반환한다(`GET /api/actions` 항목·`POST` 응답과 동일 형태).
 
 ```json
 {
@@ -324,8 +324,15 @@ DB에 저장한 뒤, 생성된 회의 1건을 반환한다.
   "content": "검색 API 엔드포인트 설계",
   "assignee": "이두리",
   "dueDate": "2026-07-07T00:00:00.000Z",
+  "startDate": "2026-07-01T00:00:00.000Z",
   "status": "done",
-  "createdAt": "2026-06-30T09:23:50.000Z"
+  "memo": "OpenAPI 초안부터 작성",
+  "createdAt": "2026-06-30T09:23:50.000Z",
+  "meeting": {
+    "id": "clxxxxxxxxxxxxxx",
+    "title": "2026 Q3 제품 로드맵 회의",
+    "date": "2026-06-27T08:30:00.000Z"
+  }
 }
 ```
 
