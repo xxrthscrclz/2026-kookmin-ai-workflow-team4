@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { useThemeStore } from '@/stores/themeStore';
-import Button from '@/components/ui/Button';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 const navItems = [
   { to: '/', label: '소개', end: true },
@@ -16,8 +15,6 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   ].join(' ');
 
 export default function Header() {
-  const { theme, toggleTheme } = useThemeStore();
-
   return (
     <header className="glass sticky top-0 z-50 border-b border-glass-border">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-4">
@@ -38,15 +35,7 @@ export default function Header() {
           ))}
         </nav>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleTheme}
-          aria-label="테마 전환"
-          className="transition-all duration-200 ease-out hover:scale-105 active:scale-95"
-        >
-          {theme === 'light' ? '🌙' : '☀️'}
-        </Button>
+        <ThemeToggle />
       </div>
     </header>
   );

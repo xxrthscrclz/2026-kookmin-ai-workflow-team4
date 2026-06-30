@@ -140,6 +140,91 @@
     animation: page-slide-left 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
+  /* Theme toggle switch */
+  .theme-switch {
+    @apply shrink-0 cursor-pointer border-0 bg-transparent p-0;
+  }
+
+  .theme-switch:focus-visible {
+    @apply outline-none rounded-full ring-2 ring-primary/40 ring-offset-2;
+  }
+
+  .theme-switch-track {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 3.75rem;
+    height: 2rem;
+    padding: 0 0.35rem;
+    border-radius: 9999px;
+    background: var(--color-glass-bg);
+    border: 1px solid var(--color-glass-border);
+    box-shadow: inset 0 1px 0 var(--color-glass-highlight);
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .theme-switch:hover .theme-switch-track {
+    border-color: var(--color-border-focus);
+    box-shadow:
+      inset 0 1px 0 var(--color-glass-highlight),
+      0 2px 12px var(--color-shadow);
+  }
+
+  .theme-switch:active .theme-switch-thumb {
+    width: 1.625rem;
+  }
+
+  .theme-switch-icon {
+    position: relative;
+    z-index: 1;
+    font-size: 0.75rem;
+    line-height: 1;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    user-select: none;
+  }
+
+  .theme-switch-icon-light {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .theme-switch-icon-dark {
+    opacity: 0.45;
+    transform: scale(0.9);
+  }
+
+  .theme-switch-thumb {
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    z-index: 2;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-glass-border);
+    box-shadow: 0 2px 8px var(--color-shadow);
+    transition:
+      transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+      width 0.15s ease,
+      background-color 0.25s ease;
+  }
+
+  .theme-switch-thumb-dark {
+    transform: translateX(1.75rem);
+  }
+
+  .theme-switch-track:has(.theme-switch-thumb-dark) .theme-switch-icon-light {
+    opacity: 0.45;
+    transform: scale(0.9);
+  }
+
+  .theme-switch-track:has(.theme-switch-thumb-dark) .theme-switch-icon-dark {
+    opacity: 1;
+    transform: scale(1);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .page-enter-fade-up,
     .page-enter-slide-right,
@@ -149,7 +234,9 @@
 
     .nav-link,
     .brand-link,
-    .brand-logo {
+    .brand-logo,
+    .theme-switch-thumb,
+    .theme-switch-track {
       transition: none;
     }
   }
