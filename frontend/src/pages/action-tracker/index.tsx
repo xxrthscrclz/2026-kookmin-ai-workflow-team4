@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '@/components/ui/Card';
 import Alert from '@/components/ui/Alert';
 import Button from '@/components/ui/Button';
 import ActionCard from '@/components/action-tracker/ActionCard';
 import ActionCalendar from '@/components/action-tracker/ActionCalendar';
 import ActionItemModal from '@/components/action-tracker/ActionItemModal';
+import { USE_MOCK } from '@/api/config';
 import { ACTION_STATUS_COLUMNS, type ActionBoardItem } from '@/constants/actionTracker';
 import { useActionTrackerStore } from '@/stores/actionTrackerStore';
 
@@ -15,22 +16,26 @@ type ModalState =
 
 export default function ActionTrackerPage() {
   const items = useActionTrackerStore((state) => state.items);
+  const loading = useActionTrackerStore((state) => state.loading);
+  const error = useActionTrackerStore((state) => state.error);
+  const fetchItems = useActionTrackerStore((state) => state.fetchItems);
   const addItem = useActionTrackerStore((state) => state.addItem);
   const updateItem = useActionTrackerStore((state) => state.updateItem);
   const removeItem = useActionTrackerStore((state) => state.removeItem);
 
   const [modal, setModal] = useState<ModalState>({ open: false });
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const itemsByStatus = useMemo(
-    () =>
-      ACTION_STATUS_COLUMNS.reduce(
-        (acc, column) => {
-          acc[column.id] = items.filter((item) => item.status === column.id);
-          return acc;
-        },
-        {} as Record<(typeof ACTION_STATUS_COLUMNS)[number]['id'], ActionBoardItem[]>,
-      ),
-    [items],
+  useEffect(() => {
+    void fetchItems();
+  }, [fetchItems]);
+
+  const itemsByStatus = ACTION_STATUS_COLUMNS.reduce(
+    (acc, column) => {
+      acc[column.id] = items.filter((item) => item.status === column.id);
+      return acc;
+    },
+    {} as Record<(typeof ACTION_STATUS_COLUMNS)[number]['id'], ActionBoardItem[]>,
   );
 
   return (
@@ -42,15 +47,31 @@ export default function ActionTrackerPage() {
             액션을 추가하고 카드를 눌러 시작일·마감일·메모를 수정하세요.
           </div>
         </div>
-        <Button type="button" onClick={() => setModal({ open: true, mode: 'add' })}>
-          액션 추가
-        </Button>
+        {USE_MOCK && (
+          <Button type="button" onClick={() => setModal({ open: true, mode: 'add' })}>
+            액션 추가
+          </Button>
+        )}
       </div>
 
-      <Alert variant="info">
-        현재는 브라우저 메모리에만 저장됩니다(API 연동 전). 4단계 상태는 FE UI 전용이며,
-        연동 시 BE와 status 계약 합의가 필요합니다.
-      </Alert>
+      {USE_MOCK ? (
+        <Alert variant="info">
+          목업 모드(VITE_USE_MOCK=true)입니다. 브라우저 메모리에만 저장됩니다.
+        </Alert>
+      ) : (
+        <Alert variant="info">
+          백엔드 API에서 액션을 불러옵니다. 상태·내용·담당자·마감일 변경은 PATCH로 저장됩니다.
+          시작일·메모는 FE 전용이며 API에 저장되지 않습니다.
+        </Alert>
+      )}
+
+      {(error || saveError) && (
+        <Alert variant="error" title="오류">
+          {error ?? saveError}
+        </Alert>
+      )}
+
+      {loading && <div className="text-sm text-text-muted">액션 목록을 불러오는 중...</div>}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {ACTION_STATUS_COLUMNS.map((column) => {
@@ -66,7 +87,7 @@ export default function ActionTrackerPage() {
                     onClick={() => setModal({ open: true, mode: 'edit', item })}
                   />
                 ))}
-                {columnItems.length === 0 && (
+                {!loading && columnItems.length === 0 && (
                   <div className="text-sm text-text-muted">항목이 없습니다.</div>
                 )}
               </div>
@@ -84,16 +105,26 @@ export default function ActionTrackerPage() {
         open={modal.open}
         mode={modal.open ? modal.mode : 'add'}
         item={modal.open && modal.mode === 'edit' ? modal.item : undefined}
-        onClose={() => setModal({ open: false })}
-        onSave={(draft) => {
-          if (modal.open && modal.mode === 'edit') {
-            updateItem(modal.item.id, draft);
-            return;
+        onClose={() => {
+          setModal({ open: false });
+          setSaveError(null);
+        }}
+        onSave={async (draft) => {
+          setSaveError(null);
+          try {
+            if (modal.open && modal.mode === 'edit') {
+              await updateItem(modal.item.id, draft);
+              setModal({ open: false });
+              return;
+            }
+            addItem(draft);
+            setModal({ open: false });
+          } catch (err) {
+            setSaveError(err instanceof Error ? err.message : '저장에 실패했습니다.');
           }
-          addItem(draft);
         }}
         onDelete={
-          modal.open && modal.mode === 'edit'
+          USE_MOCK && modal.open && modal.mode === 'edit'
             ? (id) => removeItem(id)
             : undefined
         }

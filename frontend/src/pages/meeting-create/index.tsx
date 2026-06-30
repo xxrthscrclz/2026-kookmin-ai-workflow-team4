@@ -5,19 +5,59 @@ import Button from '@/components/ui/Button';
 import Alert from '@/components/ui/Alert';
 import FileDropZone from '@/components/ui/FileDropZone';
 import DatePicker from '@/components/ui/DatePicker';
+import { createMeeting } from '@/api/command';
+import { USE_MOCK } from '@/api/config';
+import { ApiRequestError } from '@/api/errors';
+import type { Meeting } from '@/api/types';
+import { isoToDateKey } from '@/utils/actionApiMapper';
 
 export default function MeetingCreatePage() {
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState<string | null>(null);
   const [attendees, setAttendees] = useState('');
   const [rawText, setRawText] = useState('');
-  const [submitted, setSubmitted] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<Meeting | null>(null);
+  const [mockSubmitted, setMockSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setError(null);
+    setResult(null);
+
+    if (USE_MOCK) {
+      setMockSubmitted(true);
+      return;
+    }
+
+    const trimmedText = rawText.trim();
+    if (!trimmedText) {
+      setError('회의 내용을 입력해 주세요.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const attendeeList = attendees
+        .split(',')
+        .map((name) => name.trim())
+        .filter(Boolean);
+
+      const meeting = await createMeeting({
+        rawText: trimmedText,
+        ...(title.trim() ? { title: title.trim() } : {}),
+        ...(date ? { date: `${date}T00:00:00.000Z` } : {}),
+        ...(attendeeList.length > 0 ? { attendees: attendeeList } : {}),
+      });
+      setResult(meeting);
+    } catch (err) {
+      setError(err instanceof ApiRequestError ? err.message : '회의록 생성에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,10 +70,81 @@ export default function MeetingCreatePage() {
         </div>
       </div>
 
-      {submitted && (
-        <Alert variant="info" title="준비 중">
-          백엔드 API 연동 후 실제 회의록 생성이 가능합니다.
+      {USE_MOCK && mockSubmitted && (
+        <Alert variant="info" title="목업 모드">
+          VITE_USE_MOCK=true 상태입니다. API 연동을 켜려면 VITE_USE_MOCK=false로 설정하세요.
         </Alert>
+      )}
+
+      {error && (
+        <Alert variant="error" title="오류">
+          {error}
+        </Alert>
+      )}
+
+      {result && (
+        <Card title="생성된 회의록">
+          <div className="flex flex-col gap-4">
+            <div>
+              <div className="text-lg font-semibold text-text-primary">{result.title}</div>
+              <div className="text-sm text-text-secondary">
+                {isoToDateKey(result.date)} · 참석자 {result.attendees.join(', ')}
+              </div>
+            </div>
+
+            {result.minutes && (
+              <div className="flex flex-col gap-3">
+                {result.minutes.agenda.length > 0 && (
+                  <div className="flex flex-col gap-1">
+                    <div className="text-sm font-medium text-text-primary">안건</div>
+                    <div className="flex flex-col gap-1 text-sm text-text-secondary">
+                      {result.minutes.agenda.map((item) => (
+                        <div key={item}>· {item}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {result.minutes.discussion && (
+                  <div className="flex flex-col gap-1">
+                    <div className="text-sm font-medium text-text-primary">논의 요약</div>
+                    <div className="text-sm text-text-secondary">{result.minutes.discussion}</div>
+                  </div>
+                )}
+                {result.minutes.decisions.length > 0 && (
+                  <div className="flex flex-col gap-1">
+                    <div className="text-sm font-medium text-text-primary">결정 사항</div>
+                    <div className="flex flex-col gap-1 text-sm text-text-secondary">
+                      {result.minutes.decisions.map((item) => (
+                        <div key={item}>· {item}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {result.actionItems.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <div className="text-sm font-medium text-text-primary">
+                  액션 아이템 ({result.actionItems.length})
+                </div>
+                <div className="flex flex-col gap-2">
+                  {result.actionItems.map((action) => (
+                    <div
+                      key={action.id}
+                      className="rounded-lg border border-glass-border bg-bg-surface px-3 py-2 text-sm"
+                    >
+                      <div className="font-medium text-text-primary">{action.content}</div>
+                      <div className="text-xs text-text-secondary">
+                        {action.assignee ?? '담당자 미정'} · {action.status}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
       )}
 
       {uploadError && (
@@ -45,22 +156,20 @@ export default function MeetingCreatePage() {
       <Card title="회의 정보 입력">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <Input
-            label="회의 제목"
+            label="회의 제목 (선택)"
             placeholder="예: 스프린트 회고"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            required
           />
           <DatePicker
-            label="회의 날짜"
+            label="회의 날짜 (선택)"
             id="meeting-date"
-            value={date || null}
-            onChange={(next) => setDate(next ?? '')}
-            required
-            clearable={false}
+            value={date}
+            onChange={setDate}
+            clearable
           />
           <Input
-            label="참석자 (쉼표로 구분)"
+            label="참석자 (쉼표로 구분, 선택)"
             placeholder="예: 김OO, 이OO"
             value={attendees}
             onChange={(e) => setAttendees(e.target.value)}
@@ -96,8 +205,8 @@ export default function MeetingCreatePage() {
               required
             />
           </div>
-          <Button type="submit" size="lg" className="self-start">
-            회의록 생성
+          <Button type="submit" size="lg" className="self-start" disabled={loading}>
+            {loading ? '생성 중...' : '회의록 생성'}
           </Button>
         </form>
       </Card>
