@@ -52,3 +52,6 @@ jobs:
 
       - name: Smoke test (mock mode)
         run: npm run smoke
+
+      - name: Smoke test BE-2 — actions + search (mock mode)
+        run: npm run smoke:be2
