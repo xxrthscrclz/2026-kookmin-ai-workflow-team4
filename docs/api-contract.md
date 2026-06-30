@@ -6,7 +6,8 @@
 
 ## 0. 공통 규칙
 
-- Base URL: 백엔드 API 서버 (포트는 팀 확정 필요 — FE는 `http://localhost:8080` 가정).
+- Base URL: 백엔드 API 서버 (포트는 팀 확정 필요). 프론트엔드 `.env`(`VITE_SERVER_URL`)가
+  백엔드를 `http://localhost:8080`으로 가정한다. (Vite dev 서버 `:5173`과 혼동 주의 — 이 값은 FE가 호출하는 BE 주소)
   프론트엔드(Vite)는 별도 오리진이므로 백엔드에 **CORS 허용**이 필요하다.
 - 모든 요청/응답 본문은 `application/json` (UTF-8).
 - 날짜·시각은 **ISO 8601 문자열**(예: `"2026-06-30T09:00:00.000Z"`)로 주고받는다.

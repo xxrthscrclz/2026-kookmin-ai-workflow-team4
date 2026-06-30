@@ -36,6 +36,7 @@
 ```
 
 > 아래 "분담"의 소유 경로는 위 `backend/`·`frontend/` 기준이다.
+> FE 세부 규칙(라우팅·테마·API 호출 컨벤션)은 [frontend/AGENTS.md](frontend/AGENTS.md) 참고.
 
 ## 데이터 계약 (팀이 합의한 단일 공유 스키마)
 
