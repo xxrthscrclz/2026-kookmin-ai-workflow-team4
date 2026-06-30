@@ -45,8 +45,8 @@
 ```
 Meeting    { id, title, date, attendees[], rawText,
              minutes(JSON: 요약, 핵심내용[], 안건[], 논의요약, 결정사항[]), createdAt }
-ActionItem { id, meetingId, content, assignee, dueDate,
-             status('todo'|'done'), createdAt }
+ActionItem { id, meetingId, content, assignee, dueDate, startDate,
+             status('todo'|'in_progress'|'done'|'on_hold'), memo, createdAt }
 ```
 
 API 응답은 위 스키마와 정확히 일치해야 한다. mock 응답과 실제 LLM 응답의 스키마도 동일해야 한다.

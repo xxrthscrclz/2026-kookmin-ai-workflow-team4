@@ -82,7 +82,8 @@ export async function updateAction(id: string, input: UpdateActionInput) {
     data.startDate = input.startDate === null ? null : new Date(input.startDate);
   }
 
-  return prisma.actionItem.update({ where: { id }, data });
+  // GET/POST와 동일하게 meeting 컨텍스트를 포함해 반환(FE가 목록 항목 교체 시 형태 일치).
+  return prisma.actionItem.update({ where: { id }, data, ...actionWithMeeting });
 }
 
 /** DELETE /api/actions/:id — 액션아이템 1건 삭제(하드 삭제). 없으면 404. */

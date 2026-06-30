@@ -75,6 +75,7 @@ async function main() {
     const patched = (await patchRes.json()) as Record<string, any>;
     assert.equal(patched.status, "done", "status=done 반영");
     assert.equal(patched.id, action.id, "동일 액션 반환");
+    assert.ok(patched.meeting && patched.meeting.id === meetingId, "PATCH 응답에 meeting 컨텍스트 포함(GET/POST와 통일)");
 
     // 4) status=done 필터에 포함
     const doneList = (await (await fetch(`${base}/api/actions?status=done`)).json()) as Record<string, any>;
