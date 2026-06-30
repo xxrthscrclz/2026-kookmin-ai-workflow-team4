@@ -73,8 +73,14 @@ git switch -c 2026-06-ai-workflow/{id}/{agent}/{task} upstream/main
 
 ```bash
 git push -u origin {브랜치명}
-gh pr create --repo nxtcloud-edu/2026-kookmin-ai-workflow-team4 --base main --fill
+gh pr create --repo nxtcloud-edu/2026-kookmin-ai-workflow-team4 --base main --fill \
+  --assignee @me \
+  --reviewer {소유영역 담당자}
 ```
+
+- **assignee는 항상 작성자 본인(`@me`)** — PR 책임자를 명확히 해 추적·필터를 쉽게 한다.
+- **reviewer는 변경이 닿는 소유 영역의 담당자**를 지정한다. (예: 백엔드 공통·계약 변경 → BE-2, 계약·FE 영향 → FE. 둘 다 닿으면 둘 다.)
+- reviewer는 upstream(`nxtcloud-edu`) 협업자여야 지정된다.
 
 ### 최신화 (fetch)
 
